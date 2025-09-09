@@ -104,7 +104,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <button 
-              onClick={() => router.push('/landing')}
+              onClick={() => router.push('/')}
               className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
             >
               <GraduationCap className="h-8 w-8 text-blue-600" />
@@ -112,7 +112,7 @@ export default function AboutPage() {
             </button>
             <div className="flex items-center space-x-6">
               <button 
-                onClick={() => router.push('/landing')}
+                onClick={() => router.push('/')}
                 className="text-gray-600 hover:text-gray-900"
               >
                 Home
@@ -124,7 +124,7 @@ export default function AboutPage() {
                 Contact
               </button>
               <button
-                onClick={() => router.push('/')}
+                onClick={() => router.push('/auth')}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Get Started
@@ -313,7 +313,7 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/auth')}
               className="bg-yellow-400 text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
             >
               Start Using Platform
