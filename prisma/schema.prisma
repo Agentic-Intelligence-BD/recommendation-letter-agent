@@ -1,0 +1,157 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Teacher {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String
+  institution String
+  subject     String?
+  experience  Int?
+  password    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  students              Student[]
+  recommendationRequests RecommendationRequest[]
+  teacherRequests       TeacherRequest[]
+
+  @@map("teachers")
+}
+
+model Student {
+  id               String   @id @default(cuid())
+  name             String
+  email            String   @unique
+  password         String?  // For student accounts
+  grade            String
+  gpa              Float?
+  subjects         String   // JSON array of subjects
+  extracurriculars String   // JSON array of extracurriculars
+  bio              String?  // Personal essay/bio
+  supplementary    String?  // JSON object for additional info
+  institution      String?  // School name
+  teacherId        String?  // Null if student-created account
+  isStudentAccount Boolean  @default(false) // True for self-registered students
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  teacher                Teacher?                @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  targetColleges         TargetCollege[]
+  recommendationRequests RecommendationRequest[]
+  teacherRequests        TeacherRequest[]        // Requests sent to teachers
+
+  @@map("students")
+}
+
+model College {
+  id             String @id @default(cuid())
+  name           String @unique
+  type           String // 'liberal-arts' | 'research' | 'technical' | 'business' | 'other'
+  values         String // JSON array of values
+  characteristics String // JSON array of characteristics
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  targetColleges         TargetCollege[]
+  recommendationRequests RecommendationRequest[]
+
+  @@map("colleges")
+}
+
+model TargetCollege {
+  id        String @id @default(cuid())
+  studentId String
+  collegeId String
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  college College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, collegeId])
+  @@map("target_colleges")
+}
+
+model TeacherRequest {
+  id          String   @id @default(cuid())
+  studentId   String
+  teacherId   String
+  message     String?  // Personal message from student
+  status      String   @default("pending") // 'pending' | 'accepted' | 'rejected'
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, teacherId])
+  @@map("teacher_requests")
+}
+
+model RecommendationRequest {
+  id               String   @id @default(cuid())
+  studentId        String
+  teacherId        String
+  collegeId        String
+  status           String   @default("pending") // 'pending' | 'in-progress' | 'completed' | 'reviewed'
+  currentPhase     String   @default("commitment") // 'commitment' | 'questionnaire' | 'generation' | 'review'
+  finalDraft       String?  // Final recommendation letter content
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  college College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+
+  answers          Answer[]
+  generatedLetters GeneratedLetter[]
+
+  @@map("recommendation_requests")
+}
+
+model Question {
+  id       String  @id @default(cuid())
+  text     String
+  category String  // 'academic' | 'social' | 'extracurricular' | 'character' | 'leadership' | 'personal'
+  required Boolean @default(true)
+  followUp String?
+  
+  answers Answer[]
+
+  @@map("questions")
+}
+
+model Answer {
+  id                      String @id @default(cuid())
+  questionId              String
+  recommendationRequestId String
+  response                String
+  notes                   String?
+  createdAt               DateTime @default(now())
+
+  question             Question             @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  recommendationRequest RecommendationRequest @relation(fields: [recommendationRequestId], references: [id], onDelete: Cascade)
+
+  @@map("answers")
+}
+
+model GeneratedLetter {
+  id                      String   @id @default(cuid())
+  recommendationRequestId String
+  content                 String
+  tone                    String   // 'formal' | 'warm' | 'enthusiastic'
+  focus                   String   // JSON array of focus areas
+  createdAt               DateTime @default(now())
+
+  recommendationRequest RecommendationRequest @relation(fields: [recommendationRequestId], references: [id], onDelete: Cascade)
+
+  @@map("generated_letters")
+}

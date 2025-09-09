@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "recommendation-letter-agent",
+			"path": "recommendation-letter-agent"
+		}
+	],
+	"settings": {}
+}
