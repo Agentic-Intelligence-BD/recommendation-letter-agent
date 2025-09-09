@@ -1,8 +1,5 @@
 {
   "buildCommand": "prisma generate && next build",
-  "env": {
-    "PRISMA_QUERY_ENGINE_LIBRARY": "@prisma/query-engine-rhel-openssl-1.0.x"
-  },
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30
