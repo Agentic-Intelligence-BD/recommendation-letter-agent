@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
       email: teacher.email,
       name: teacher.name,
       institution: teacher.institution,
+      userType: 'teacher'
     })
 
     // Return user data without password

@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const token = authHeader.substring(7);
     const payload = verifyJWT(token);
 
-    if (!payload || payload.userType !== 'teacher') {
+    if (!payload || (payload.userType && payload.userType !== 'teacher')) {
       return NextResponse.json(
         { error: 'Invalid token or insufficient permissions' },
         { status: 401 }

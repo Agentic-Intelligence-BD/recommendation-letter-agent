@@ -37,17 +37,30 @@ export async function GET(
 
     const studentId = params.id;
 
+    // Allow both teacher accessing their students and students accessing their own data
+    const whereClause = user.userType === 'student' 
+      ? { id: user.id } // Student can only access their own data
+      : { id: studentId, teacherId: user.id }; // Teacher can access their students' data
+
     const student = await prisma.student.findFirst({
-      where: {
-        id: studentId,
-        teacherId: user.id,
-      },
+      where: whereClause,
       include: {
         targetColleges: {
           include: {
             college: true,
           },
         },
+        teacherRequests: {
+          include: {
+            teacher: true
+          }
+        },
+        recommendationRequests: {
+          include: {
+            teacher: true,
+            college: true
+          }
+        }
       },
     });
 
@@ -109,12 +122,13 @@ export async function PUT(
 
     const data = validationResult.data;
 
-    // Check if student exists and belongs to the teacher
+    // Check if student exists and is accessible by the user
+    const whereClause = user.userType === 'student' 
+      ? { id: user.id } // Student can only update their own data
+      : { id: studentId, teacherId: user.id }; // Teacher can update their students' data
+
     const existingStudent = await prisma.student.findFirst({
-      where: {
-        id: studentId,
-        teacherId: user.id,
-      },
+      where: whereClause,
     });
 
     if (!existingStudent) {

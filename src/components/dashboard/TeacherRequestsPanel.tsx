@@ -17,7 +17,7 @@ export default function TeacherRequestsPanel() {
 
   const loadRequests = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       const response = await fetch('/api/teachers/requests', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -39,7 +39,7 @@ export default function TeacherRequestsPanel() {
     setProcessingRequest(requestId);
     
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       const response = await fetch(`/api/teacher-requests/${requestId}`, {
         method: 'PUT',
         headers: { 

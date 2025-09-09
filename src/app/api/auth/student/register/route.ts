@@ -90,6 +90,7 @@ export async function POST(request: NextRequest) {
       email: student.email,
       name: student.name,
       institution: student.institution || '',
+      userType: 'student'
     });
 
     return NextResponse.json({

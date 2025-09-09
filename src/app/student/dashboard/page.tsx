@@ -27,8 +27,16 @@ export default function StudentDashboard() {
   const [activeTab, setActiveTab] = useState<'overview' | 'requests' | 'letters' | 'profile'>('overview');
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [profileData, setProfileData] = useState({
+    name: '',
+    email: '',
+    grade: '',
+    gpa: null as number | null,
+    institution: '',
+    subjects: [] as string[],
+    extracurriculars: [] as string[],
     bio: '',
-    supplementary: ''
+    supplementary: '',
+    targetColleges: [] as any[]
   });
   const [savingProfile, setSavingProfile] = useState(false);
 
@@ -58,13 +66,22 @@ export default function StudentDashboard() {
         throw new Error('Failed to load student data');
       }
 
-      const studentData = await response.json();
+      const data = await response.json();
+      const studentData = data.student;
       setStudent(studentData);
       
       // Initialize profile data
       setProfileData({
+        name: studentData.name || '',
+        email: studentData.email || '',
+        grade: studentData.grade || '',
+        gpa: studentData.gpa,
+        institution: studentData.institution || '',
+        subjects: studentData.subjects || [],
+        extracurriculars: studentData.extracurriculars || [],
         bio: studentData.bio || '',
-        supplementary: studentData.supplementary || ''
+        supplementary: studentData.supplementary || '',
+        targetColleges: studentData.targetColleges || []
       });
     } catch (error) {
       console.error('Error loading student data:', error);
@@ -94,15 +111,29 @@ export default function StudentDashboard() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update profile');
       }
 
       const data = await response.json();
       setStudent(data.student);
+      // Update profile data with the response
+      setProfileData({
+        name: data.student.name || '',
+        email: data.student.email || '',
+        grade: data.student.grade || '',
+        gpa: data.student.gpa,
+        institution: data.student.institution || '',
+        subjects: data.student.subjects || [],
+        extracurriculars: data.student.extracurriculars || [],
+        bio: data.student.bio || '',
+        supplementary: data.student.supplementary || '',
+        targetColleges: data.student.targetColleges || []
+      });
       alert('Profile updated successfully!');
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Failed to update profile. Please try again.');
+      alert(error instanceof Error ? error.message : 'Failed to update profile. Please try again.');
     } finally {
       setSavingProfile(false);
     }
@@ -272,7 +303,7 @@ export default function StudentDashboard() {
                     <h3 className="font-medium text-gray-900">Subjects</h3>
                   </div>
                   <div className="flex flex-wrap gap-1">
-                    {student.subjects.map((subject, index) => (
+                    {(student.subjects || []).map((subject, index) => (
                       <span
                         key={index}
                         className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
@@ -282,14 +313,14 @@ export default function StudentDashboard() {
                     ))}
                   </div>
 
-                  {student.extracurriculars.length > 0 && (
+                  {(student.extracurriculars || []).length > 0 && (
                     <div className="mt-4">
                       <div className="flex items-center space-x-2 mb-3">
                         <Target className="h-4 w-4 text-gray-600" />
                         <h3 className="font-medium text-gray-900">Activities</h3>
                       </div>
                       <div className="flex flex-wrap gap-1">
-                        {student.extracurriculars.map((activity, index) => (
+                        {(student.extracurriculars || []).map((activity, index) => (
                           <span
                             key={index}
                             className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full"
@@ -479,12 +510,174 @@ export default function StudentDashboard() {
           >
             <h2 className="text-2xl font-bold text-gray-900">Profile Settings</h2>
 
+            {/* Basic Information */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={profileData.name}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={profileData.email}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Grade
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={profileData.grade}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, grade: e.target.value }))}
+                  >
+                    <option value="">Select Grade</option>
+                    <option value="9th">9th Grade</option>
+                    <option value="10th">10th Grade</option>
+                    <option value="11th">11th Grade</option>
+                    <option value="12th">12th Grade</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    GPA (Optional)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="5"
+                    step="0.1"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={profileData.gpa || ''}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, gpa: e.target.value ? parseFloat(e.target.value) : null }))}
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Institution
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={profileData.institution}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, institution: e.target.value }))}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Academic Information */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Academic Information</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Subjects
+                  </label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {profileData.subjects.map((subject, index) => (
+                      <span
+                        key={index}
+                        className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full flex items-center space-x-2"
+                      >
+                        <span>{subject}</span>
+                        <button
+                          onClick={() => setProfileData(prev => ({
+                            ...prev,
+                            subjects: prev.subjects.filter((_, i) => i !== index)
+                          }))}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Type a subject and press Enter"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const value = e.currentTarget.value.trim();
+                        if (value && !profileData.subjects.includes(value)) {
+                          setProfileData(prev => ({
+                            ...prev,
+                            subjects: [...prev.subjects, value]
+                          }));
+                          e.currentTarget.value = '';
+                        }
+                      }
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Extracurricular Activities
+                  </label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {profileData.extracurriculars.map((activity, index) => (
+                      <span
+                        key={index}
+                        className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full flex items-center space-x-2"
+                      >
+                        <span>{activity}</span>
+                        <button
+                          onClick={() => setProfileData(prev => ({
+                            ...prev,
+                            extracurriculars: prev.extracurriculars.filter((_, i) => i !== index)
+                          }))}
+                          className="text-green-600 hover:text-green-800"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Type an activity and press Enter"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const value = e.currentTarget.value.trim();
+                        if (value && !profileData.extracurriculars.includes(value)) {
+                          setProfileData(prev => ({
+                            ...prev,
+                            extracurriculars: [...prev.extracurriculars, value]
+                          }));
+                          e.currentTarget.value = '';
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Personal Information */}
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
               <p className="text-gray-600 mb-4">
-                Update your profile information and personal essay (bio) that teachers can use when writing your recommendations.
+                This information will help teachers write more personalized recommendation letters.
               </p>
-              
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -492,13 +685,10 @@ export default function StudentDashboard() {
                   </label>
                   <textarea
                     className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Write about yourself, your goals, achievements, and what makes you unique. This will help teachers write more personalized letters."
+                    placeholder="Write about yourself, your goals, achievements, and what makes you unique."
                     value={profileData.bio}
                     onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    This information is only visible to teachers who are writing your recommendations.
-                  </p>
                 </div>
 
                 <div>
@@ -507,27 +697,30 @@ export default function StudentDashboard() {
                   </label>
                   <textarea
                     className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Any additional context, achievements, or information you'd like teachers to know when writing your letters."
+                    placeholder="Any additional context, achievements, or information you'd like teachers to know."
                     value={profileData.supplementary}
                     onChange={(e) => setProfileData(prev => ({ ...prev, supplementary: e.target.value }))}
                   />
                 </div>
-
-                <button 
-                  onClick={handleProfileSave}
-                  disabled={savingProfile}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                >
-                  {savingProfile ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Saving...</span>
-                    </>
-                  ) : (
-                    <span>Save Changes</span>
-                  )}
-                </button>
               </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="flex justify-end">
+              <button 
+                onClick={handleProfileSave}
+                disabled={savingProfile}
+                className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              >
+                {savingProfile ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <span>Save All Changes</span>
+                )}
+              </button>
             </div>
           </motion.div>
         )}
