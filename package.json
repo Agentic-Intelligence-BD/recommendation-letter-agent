@@ -48,5 +48,8 @@
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
     "tsx": "^4.0.0"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }
