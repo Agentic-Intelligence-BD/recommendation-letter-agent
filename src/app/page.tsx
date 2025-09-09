@@ -39,8 +39,44 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Hero Section */}
+    <div className="min-h-screen">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <button 
+              onClick={() => router.push('/landing')}
+              className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+            >
+              <GraduationCap className="h-8 w-8 text-blue-600" />
+              <span className="text-xl font-bold text-gray-900">RecommendAI</span>
+            </button>
+            <div className="flex items-center space-x-6">
+              <button 
+                onClick={() => router.push('/landing')}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Home
+              </button>
+              <button 
+                onClick={() => router.push('/about')}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                About
+              </button>
+              <button 
+                onClick={() => router.push('/contact')}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Contact
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="flex min-h-screen">
+        {/* Left side - Hero Section */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-purple-700 text-white p-12 flex-col justify-center">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -50,7 +86,7 @@ export default function HomePage() {
           <div className="mb-8">
             <GraduationCap className="h-16 w-16 mb-4" />
             <h1 className="text-5xl font-bold mb-4">
-              Recommendation Letter Assistant
+              RecommendAI
             </h1>
             <p className="text-xl text-blue-100 mb-8">
               Empowering Bangladeshi teachers to write compelling recommendation letters for their students' US college applications
@@ -119,13 +155,13 @@ export default function HomePage() {
       </div>
 
       {/* Right side - Auth Forms */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50 min-h-screen">
         <div className="w-full max-w-md">
           {/* Mobile Header */}
           <div className="lg:hidden text-center mb-8">
             <GraduationCap className="h-12 w-12 mx-auto text-blue-600 mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Recommendation Letter Assistant
+              RecommendAI
             </h1>
             <p className="text-gray-600">
               Help your students succeed with AI-powered recommendation letters
@@ -141,7 +177,7 @@ export default function HomePage() {
             >
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Welcome to Recommendation Letter Assistant
+                  Welcome to RecommendAI
                 </h2>
                 <p className="text-gray-600 mb-8">
                   Choose your account type to get started
@@ -280,6 +316,7 @@ export default function HomePage() {
             </motion.div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
