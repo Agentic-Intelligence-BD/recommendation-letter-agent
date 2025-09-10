@@ -1,0 +1,18 @@
+# Alternative deployment option for App Engine
+runtime: nodejs18
+
+env_variables:
+  NODE_ENV: production
+
+automatic_scaling:
+  min_instances: 1
+  max_instances: 10
+  target_cpu_utilization: 0.6
+
+# Uncomment and configure if using VPC
+# vpc_access_connector:
+#   name: "projects/PROJECT_ID/locations/us-central1/connectors/recommendai-connector"
+
+# Database connection (will be configured during deployment)
+# beta_settings:
+#   cloud_sql_instances: PROJECT_ID:us-central1:recommendai-db

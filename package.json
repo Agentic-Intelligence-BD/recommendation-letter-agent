@@ -14,7 +14,8 @@
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && prisma db push && next build"
+    "vercel-build": "prisma generate && prisma db push && next build",
+    "gcp-build": "prisma generate && npm run build"
   },
   "dependencies": {
     "next": "14.0.0",
